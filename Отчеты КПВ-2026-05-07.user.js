@@ -1,12 +1,10 @@
 // ==UserScript==
-// @name         KPV report
+// @name         Отчеты КПВ
 // @namespace    http://tampermonkey.net/
-// @version      2026-05-07
+// @version      2.0
 // @description  Автоматическое заполнение отчётов
 // @match        https://*.catwar.su/blog*
 // @match        https://*.catwar.net/blog*
-// @updateURL    https://raw.githubusercontent.com/TsarII/KPV-report/main/Отчеты%20КПВ-2026-05-07.user.js
-// @downloadURL  https://raw.githubusercontent.com/TsarII/KPV-report/main/Отчеты%20КПВ-2026-05-07.user.js
 // @grant        none
 // ==/UserScript==
 
@@ -262,7 +260,21 @@ const UI = {
     border-color: #ffffff;
     box-shadow: 0 0 0 2px rgba(255,255,255,0.15);
 }
-`;
+.kpv_res_row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+    gap: 8px;
+}
+
+.kpv_res_row span {
+    display: inline-block;
+    width: 150px; /* одинаковая ширина текста */
+}
+
+.kpv_res_row input {
+    width: 60px;
+}`;
 
 $('<style>').text(style).appendTo('head');
 $('<style>').text(style).appendTo('head');
@@ -403,6 +415,8 @@ if (savedID) {
 
 }
 
+
+
                 $(document).on('click', '#kpv_check_doz', function() {
 
     const authors = {};
@@ -538,6 +552,7 @@ const months = [
   "мая", "июня", "июля", "августа",
   "сентября", "октября", "ноября", "декабря"
 ];
+
               const my_id = parseInt($('#cws_blog_myid').val());
               rememberMyID(my_id);
               let date = splitDateStr($("#kpv_doz1_date").val());
@@ -720,15 +735,44 @@ ${my_id_zu_div}
     <p class="view-title">Плавательный заплыв</p>
     <table>
         <tr><td>Дата и время:</td><td><input type="date" class="cws-input" id="kpv_doz1_date" required value="${date_str}"></td><td><input type="time" class="cws-input" id="kpv_doz1_time" required value="${doz_time}" step="60"></td><td></td></tr>
-        </tr>
-        <tr><td>Страховал:</td><td> <input type="number" class="cws-input" id="kpv_swim_guard"
-        placeholder="ID ДН"></td>   <td>
-        <input type="number" class="cws-input" id="kpv_swim_guard_zu" placeholder="ЗУ" min="7" max="9" style="width:60px;">
-    </td><td></td></tr>
-        <tr><td>Плавание организовал:</td><td><input type="number" class="cws-input" id="kpv_swim_org"
-        placeholder="ID организатора""></td><td>
-        <input type="number" class="cws-input" id="kpv_swim_org_zu" placeholder="ЗУ" min="7" max="9" style="width:60px;">
-    </td><td></td></tr>
+        <tr>
+    <td>Страховал:</td>
+    <td>
+        <input type="number"
+               class="cws-input"
+               id="kpv_swim_guard"
+               placeholder="ID ДН">
+    </td>
+    <td></td>
+    <td></td>
+</tr>
+       <tr>
+    <td>Плавание организовал:</td>
+
+    <td>
+        <input type="number"
+               class="cws-input"
+               id="kpv_swim_org"
+               placeholder="ID организатора">
+    </td>
+
+    <td>
+        <input type="number"
+               class="cws-input"
+               id="kpv_swim_org_zu"
+               placeholder="ЗУ"
+               min="7"
+               max="9"
+               style="width:60px;">
+    </td>
+
+    <td style="white-space:nowrap;">
+        <label>
+            <input type="checkbox" id="kpv_remember_swim_org">
+            Запомнить
+        </label>
+    </td>
+</tr>
         <tr><td>Участники заплыва:</td><td><textarea class="cws-input" id="kpv_swim_members"
                   placeholder="ID участников через запятую: 123,456,789. ЗУ указывается рядом через пробел."></textarea></td><td></td></tr>
     </table>
@@ -743,25 +787,30 @@ ${my_id_zu_div}
 <tr>
     <td>Количество и вид:</td>
     <td>
-        <div>Ракушка:
-            <input type="number" class="cws-input" id="res_shell" value="0" min="0" style="width:60px;">
-        </div>
+<div class="kpv_res_row">
+    <span>Ракушка:</span>
+    <input type="number" class="cws-input" id="res_shell" value="0" min="0">
+</div>
 
-        <div>Крепкая ветка:
-            <input type="number" class="cws-input" id="res_branch" value="0" min="0" style="width:60px;">
-        </div>
+<div class="kpv_res_row">
+    <span>Крепкая ветка:</span>
+    <input type="number" class="cws-input" id="res_branch" value="0" min="0">
+</div>
 
-        <div>Мох:
-            <input type="number" class="cws-input" id="res_moss" value="0" min="0" style="width:60px;">
-        </div>
+<div class="kpv_res_row">
+    <span>Мох:</span>
+    <input type="number" class="cws-input" id="res_moss" value="0" min="0">
+</div>
 
-        <div>Плотная водоросль:
-            <input type="number" class="cws-input" id="res_dense" value="0" min="0" style="width:60px;">
-        </div>
+<div class="kpv_res_row">
+    <span>Плотная водоросль:</span>
+    <input type="number" class="cws-input" id="res_dense" value="0" min="0">
+</div>
 
-        <div>Целебная водоросль:
-            <input type="number" class="cws-input" id="res_heal" value="0" min="0" style="width:60px;">
-        </div>
+<div class="kpv_res_row">
+    <span>Целебная водоросль:</span>
+    <input type="number" class="cws-input" id="res_heal" value="0" min="0">
+</div>
     </td>
 </tr>
 
@@ -789,12 +838,78 @@ ${my_id_zu_div}
     <div></div>
     <button class="inp-button" id="kpv_doz2">Заполнить отчет</button>
   </div>`);
+    const savedOrg = localStorage.getItem('kpo_swim_org');
+const savedOrgZU = localStorage.getItem('kpo_swim_org_zu');
+
+if (savedOrg) {
+    $('#kpv_swim_org').val(savedOrg);
+    $('#kpv_remember_swim_org').prop('checked', true);
+}
+
+if (savedOrgZU) {
+    $('#kpv_swim_org_zu').val(savedOrgZU);
+}
+
+              if ($('#kpv_remember_swim_org').is(':checked')) {
+    localStorage.setItem('kpo_swim_org', $('#kpv_swim_org').val());
+    localStorage.setItem('kpo_swim_org_zu', $('#kpv_swim_org_zu').val());
+} else {
+    localStorage.removeItem('kpo_swim_org');
+    localStorage.removeItem('kpo_swim_org_zu');
+}
+
+            $(document).on(
+    'input change',
+    '#kpv_swim_org, #kpv_swim_org_zu, #kpv_remember_swim_org',
+    function () {
+
+        if ($('#kpv_remember_swim_org').prop('checked')) {
+
+            localStorage.setItem(
+                'kpo_swim_org',
+                $('#kpv_swim_org').val().trim()
+            );
+
+            localStorage.setItem(
+                'kpo_swim_org_zu',
+                $('#kpv_swim_org_zu').val().trim()
+            );
+
+        } else {
+
+            localStorage.removeItem('kpo_swim_org');
+            localStorage.removeItem('kpo_swim_org_zu');
+        }
+    }
+);
+              $(document).on('input', '#kpv_swim_org', function () {
+    localStorage.setItem(
+        'kpo_swim_org',
+        $(this).val().trim()
+    );
+});
+
+$(document).on('input', '#kpv_swim_org_zu', function () {
+    localStorage.setItem(
+        'kpo_swim_org_zu',
+        $(this).val().trim()
+    );
+});
+
               $('#kpv_swim_id').val(
     localStorage.getItem('cw_my_id') || ''
 );
             const savedID =
     localStorage.getItem('cw_my_id');
     localStorage.getItem('cw_my_zu');
+              // Организатор плавания
+$('#kpv_swim_org').val(
+    localStorage.getItem('kpo_swim_org') || ''
+);
+
+$('#kpv_swim_org_zu').val(
+    localStorage.getItem('kpo_swim_org_zu') || ''
+);
 
 if (savedID) {
 
@@ -935,7 +1050,9 @@ if (savedID) {
           });
             /*ЗАПЛЫВ*/
           $('#kpv_doz1').on('click', function (e) {
-       
+
+
+
               const my_id = parseInt($('#cws_blog_myid').val());
               rememberMyID(my_id);
 
@@ -944,16 +1061,9 @@ let date = splitDateStr($("#kpv_doz1_date").val());
 
 let text = `[b]Дата и время:[/b] ${date.day}.${date.month}, ${$("#kpv_doz1_time").val()}.`;
           const guardID = $('#kpv_swim_guard').val().trim();
-const guardZU = parseInt($('#kpv_swim_guard_zu').val());
 
 if (guardID) {
-    let guardText = masking(guardID, '[cat%ID%]|%ID%');
-
-    if ([7, 8, 9].includes(guardZU)) {
-        guardText += ` (${guardZU})`;
-    }
-
-    text += `\n[b]Страховал:[/b] ${guardText}.`;
+    text += `\n[b]Страховал:[/b] ${masking(guardID, '[cat%ID%]|%ID%')}.`;
 }
              const orgID = $('#kpv_swim_org').val().trim();
 const orgZU = parseInt($('#kpv_swim_org_zu').val());
