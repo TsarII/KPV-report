@@ -1,10 +1,12 @@
 // ==UserScript==
 // @name         KPV report
 // @namespace    http://tampermonkey.net/
-// @version      2.1
+// @version      2.2
 // @description  Автоматическое заполнение отчётов
 // @match        https://*.catwar.su/blog*
 // @match        https://*.catwar.net/blog*
+// @updateURL    https://raw.githubusercontent.com/TsarII/KPV-report/main/Отчеты%20КПВ-2026-05-07.user.js
+// @downloadURL  https://raw.githubusercontent.com/TsarII/KPV-report/main/Отчеты%20КПВ-2026-05-07.user.js
 // @grant        none
 // ==/UserScript==
 
