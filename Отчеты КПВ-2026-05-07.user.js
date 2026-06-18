@@ -1,7 +1,8 @@
 // ==UserScript==
 // @name         KPV report
 // @namespace    http://tampermonkey.net/
-// @version      2.2
+// @author       Цари / Ритуал [1241910]
+// @version      2.3
 // @description  Автоматическое заполнение отчётов
 // @match        https://*.catwar.su/blog*
 // @match        https://*.catwar.net/blog*
@@ -84,6 +85,39 @@ function rememberMyID(id) {
             id
         );
     }
+}
+
+function countCleanCats(history) {
+    if (!history || typeof history !== "string") return 0;
+
+    let total = 0;
+
+    // ===== 1. ГРУППОВОЙ ФОРМАТ =====
+    const groupMatches = history.matchAll(/Проверен и поднят\s*\[(.*?)\]/gs);
+
+    for (const match of groupMatches) {
+        const inside = match[1];
+
+        // разделяем только по запятой
+        const items = inside
+            .split(",")
+            .map(x => x.trim())
+            .filter(Boolean);
+
+        total += items.length;
+    }
+
+    // ===== 2. ОДИНОЧНЫЕ ПОДЪЁМЫ =====
+    const singleMatches = history.matchAll(
+        /Поднял(?:а|о|и)?\s+[^.]*?по имени\s+([^(.\n]+)/g
+    );
+
+    for (const match of singleMatches) {
+        const name = match[1]?.trim();
+        if (name) total += 1;
+    }
+
+    return total;
 }
 
 function nameToID(name, async = false) {
@@ -1195,6 +1229,471 @@ let resources = [];
             $(last_e).find($('.add-field')).css('display', 'inline-block');
           });
         }
+
+             if (blogID == 22401) { // Чистка
+          let patr_time = 9,
+            patr_date = new Date(date),
+            doz_date = new Date(date);
+          let hour = date.getHours(),
+            minute = date.getMinutes();
+          let doz_time = leadZero(hour) + ':' + leadZero(minute);
+          if (hour < 8 || hour == 8 && minute < 55) {
+            patr_date.setDate(patr_date.getDate() - 1);
+          } // yesterday
+          if (hour >= 9 || hour == 8 && minute >= 55) {
+            patr_time = 9;
+          }
+          if (hour >= 11 || hour == 10 && minute >= 55) {
+            patr_time = 11;
+          }
+          if (hour >= 15 || hour == 14 && minute >= 55) {
+            patr_time = 15;
+          }
+          if (hour >= 18 || hour == 17 && minute >= 55) {
+            patr_time = 18;
+          }
+          if (hour >= 21 || hour == 20 && minute >= 55) {
+            patr_time = 21;
+          }
+          if (hour >= 23 || hour == 22 && minute >= 55) {
+            patr_time = 23;
+          }
+          patr_time = leadZero(patr_time);
+          const patr_date_str = patr_date.getFullYear() + '-' + leadZero(patr_date.getMonth() + 1) + '-' + leadZero(patr_date.getDate());
+          const doz_options = `<option value="Водопад">Водопад</option>
+<option value="Горный перевал">Горный перевал</option>
+<option value="Обрушенная вершина">Обрушенная вершина</option>
+<option value="Плато диких ветров">Плато диких ветров</option>
+<option value="1 маршрут">1 маршрут</option>
+<option value="2 маршрут">2 маршрут</option>
+<option value="3 маршрут">3 маршрут</option>
+<option value="4 маршрут">4 маршрут</option>`;
+$('#send_comment').append(`
+<hr>
+<div class="cws_doz_wrapper">
+<h3>Чистка</h3>
+<hr>
+
+${my_id_zu_div}
+<hr>
+
+<table>
+
+<tr>
+    <td>Игроки в боевой стойке:</td>
+    <td>
+        <input type="number"
+               class="cws-input"
+               id="kpv_fight_players"
+               placeholder="Количество игроков">
+    </td>
+</tr>
+
+<tr>
+    <td>История:</td>
+    <td>
+        <textarea class="cws-input"
+                  id="kpv_clean_history"
+                  placeholder="Вставьте текст истории..."></textarea>
+    </td>
+</tr>
+
+</table>
+
+<div style="margin-top:10px;">
+    <button class="inp-button" id="kpv_clean_send">
+        Заполнить отчет
+    </button>
+</div>
+`);
+    const savedOrg = localStorage.getItem('kpo_swim_org');
+const savedOrgZU = localStorage.getItem('kpo_swim_org_zu');
+
+if (savedOrg) {
+    $('#kpv_swim_org').val(savedOrg);
+    $('#kpv_remember_swim_org').prop('checked', true);
+}
+
+if (savedOrgZU) {
+    $('#kpv_swim_org_zu').val(savedOrgZU);
+}
+
+              if ($('#kpv_remember_swim_org').is(':checked')) {
+    localStorage.setItem('kpo_swim_org', $('#kpv_swim_org').val());
+    localStorage.setItem('kpo_swim_org_zu', $('#kpv_swim_org_zu').val());
+} else {
+    localStorage.removeItem('kpo_swim_org');
+    localStorage.removeItem('kpo_swim_org_zu');
+}
+
+            $(document).on(
+    'input change',
+    '#kpv_swim_org, #kpv_swim_org_zu, #kpv_remember_swim_org',
+    function () {
+
+        if ($('#kpv_remember_swim_org').prop('checked')) {
+
+            localStorage.setItem(
+                'kpo_swim_org',
+                $('#kpv_swim_org').val().trim()
+            );
+
+            localStorage.setItem(
+                'kpo_swim_org_zu',
+                $('#kpv_swim_org_zu').val().trim()
+            );
+
+        } else {
+
+            localStorage.removeItem('kpo_swim_org');
+            localStorage.removeItem('kpo_swim_org_zu');
+        }
+    }
+);
+              $(document).on('input', '#kpv_swim_org', function () {
+    localStorage.setItem(
+        'kpo_swim_org',
+        $(this).val().trim()
+    );
+});
+
+$(document).on('input', '#kpv_swim_org_zu', function () {
+    localStorage.setItem(
+        'kpo_swim_org_zu',
+        $(this).val().trim()
+    );
+});
+
+              $('#kpv_swim_id').val(
+    localStorage.getItem('cw_my_id') || ''
+);
+            const savedID =
+    localStorage.getItem('cw_my_id');
+    localStorage.getItem('cw_my_zu');
+              // Организатор плавания
+$('#kpv_swim_org').val(
+    localStorage.getItem('kpo_swim_org') || ''
+);
+
+$('#kpv_swim_org_zu').val(
+    localStorage.getItem('kpo_swim_org_zu') || ''
+);
+
+if (savedID) {
+
+    $('#cws_blog_myid')
+        .val(savedID);
+
+    $('#cws_blog_remember_id')
+        .prop('checked', true);
+
+}
+
+                $(document).on('click', '#kpv_check_doz', function() {
+
+    const authors = {};
+
+   $('.view-comment').each(function(index) {
+
+    // Игнорируем первые 3 комментария
+    if (index < 3) {
+        return true;
+    }
+
+        const text = $(this).find('.comment-text .parsed').text().trim();
+
+        const textLower = text.toLowerCase();
+
+
+        // начало дежурства
+        const isDozStart = textLower.includes('дежурит:');
+
+        // конец дежурства
+        const isDozEnd =
+            textLower.includes('локация/маршрут:') ||
+            textLower.includes('дата и время:');
+
+        if (isDozStart) {
+
+            const match = text.match(
+                /(\d{1,2}\s+\S+,\s+\d{1,2}:\d{2})[\s\S]*?Дежурит:\s*\[([^\]]+)\]\s*[—-]\s*\[([^\]]+)\]/iu
+            );
+
+            if (match) {
+
+                const date = match[1].trim();
+                const cat = match[2].trim();
+                const place = match[3].trim();
+
+                authors[cat] = {
+                    place,
+                    date
+                };
+            }
+
+        } else if (isDozEnd) {
+
+            // снимаем дежурство
+            const endMatch = text.match(/Дежурил:\s*\[([^\]|]+)/iu);
+
+            if (endMatch) {
+                const cat = endMatch[1].trim();
+                authors[cat] = null;
+            }
+        }
+    });
+
+    const result = {};
+
+    for (let [cat, data] of Object.entries(authors)) {
+
+        if (data === null) continue;
+
+        const place = data.place.toLowerCase();
+
+        if (!result[place]) {
+            result[place] = [];
+        }
+
+        result[place].push({
+            cat,
+            date: data.date
+        });
+    }
+
+    for (const value in result) {
+
+        result[value] = result[value]
+            .map(({cat, date}) => `${cat} (с ${date})`)
+            .join(', ');
+    }
+
+    const places = [
+        'Водопад',
+        'Горный перевал',
+        'Обрушенная вершина',
+        'Плато диких ветров',
+        '1 маршрут',
+        '2 маршрут',
+        '3 маршрут',
+        '4 маршрут'
+    ];
+
+    let text = '';
+
+    for (const place of places) {
+
+        const placeLower = place.toLowerCase();
+
+        if (result[placeLower]) {
+
+            if (text) {
+                text += '<br>';
+            }
+
+            text += place + ' - ' + result[placeLower];
+        }
+    }
+
+    if (!text) {
+        text = 'Никто не дежурит!';
+    }
+
+    $('#kpv_checked_doz').html(text);
+});
+          $('#kpv_doz1_place, #kpv_doz2_place').on('change', function (e) {
+              const val = $(this).val();
+              const n = $(this).attr('id').indexOf('doz1') !== -1 ? 2 : 1;
+              $(`#kpv_doz${n}_place > option[value="${val}"`).prop('selected', true);
+          });
+          $('#kpv_doz1_time, #kpv_doz2_time').on('change', function (e) {
+              const val = $(this).val();
+              const n = $(this).attr('id').indexOf('doz1') !== -1 ? 2 : 1;
+              $(`#kpv_doz${n}_time`).val(val);
+          });
+          $('#kpv_doz1_date, #kpv_doz2_date').on('change', function (e) {
+              const val = $(this).val();
+              const n = $(this).attr('id').indexOf('doz1') !== -1 ? 2 : 1;
+              $(`#kpv_doz${n}_date`).val(val);
+          });
+            /*Чистка?*/
+
+                $(document).on('click', '#kpv_clean_send', function () {
+
+    const my_id = parseInt($('#cws_blog_myid').val());
+    rememberMyID(my_id);
+
+    const history = $('#kpv_clean_history').val().trim();
+    const fightPlayers = parseInt($('#kpv_fight_players').val()) || 0;
+
+    const catsCount = history ? countCleanCats(history) : 0;
+
+    let text = '';
+
+    text += `[b]Имя и ID:[/b] ${masking(my_id, '[cat%ID%]|%ID%')}.`;
+
+    text += `\n[b]Количество убранных котов:[/b] ${catsCount}.`;
+
+                                  if (fightPlayers > 0) {
+        text += `\n[b]Игроки в боевой стойке:[/b] ${fightPlayers}.`;
+    }
+
+    if (history) {
+        text += `\n[b]Подтверждение:[/b] [[header=историячистки]история[/header]]`;
+        text += `\n[block=историячистки]${history}[/block]`;
+    }
+
+    let val = $('#comment').val();
+    if (val) val += "\n\n";
+
+
+    $('#comment').val(val + text).scrollintoview();
+});
+          $('#kpv_doz1').on('click', function (e) {
+
+
+
+              const my_id = parseInt($('#cws_blog_myid').val());
+              rememberMyID(my_id);
+
+
+let date = splitDateStr($("#kpv_doz1_date").val());
+
+let text = `[b]Дата и время:[/b] ${date.day}.${date.month}, ${$("#kpv_doz1_time").val()}.`;
+          const guardID = $('#kpv_swim_guard').val().trim();
+
+if (guardID) {
+    text += `\n[b]Страховал:[/b] ${masking(guardID, '[cat%ID%]|%ID%')}.`;
+}
+             const orgID = $('#kpv_swim_org').val().trim();
+const orgZU = parseInt($('#kpv_swim_org_zu').val());
+
+if (orgID) {
+    let orgText = masking(orgID, '[cat%ID%]|%ID%');
+
+    if ([7, 8, 9].includes(orgZU)) {
+        orgText += ` (${orgZU})`;
+    }
+
+    text += `\n[b]Плавание организовал:[/b] ${orgText}.`;
+}
+ const members = $('#kpv_swim_members').val().trim();
+
+if (members) {
+    const membersText = members
+        .split(',')
+        .map(item => item.trim())
+        .filter(item => item)
+        .map(item => {
+            const parts = item.split(/\s+/);
+
+            const id = parts[0];
+            const zu = parseInt(parts[1]);
+
+            let member = masking(id, '[cat%ID%]|%ID%');
+
+            if ([7, 8, 9].includes(zu)) {
+                member += ` (${zu})`;
+            }
+
+            return member;
+        })
+        .join(', ');
+
+    text += `\n[b]Участники заплыва:[/b] ${membersText}.`;
+}
+              let val = $('#comment').val();
+              if (val) {
+                  val += "\n\n";
+              }
+            $('#comment').val(val + text).scrollintoview();
+          });
+          /*РЕСУРСЫ*/
+$('#kpv_doz2').on('click', function (e) {
+
+    const my_id = parseInt($('#cws_blog_myid').val());
+    rememberMyID(my_id);
+
+    let text = `[b]ID:[/b] ${masking(my_id, '%ID%')}.`;
+
+    function declension(number, one, two, five) {
+    number = Math.abs(number) % 100;
+    const n1 = number % 10;
+
+    if (number > 10 && number < 20) return five;
+    if (n1 > 1 && n1 < 5) return two;
+    if (n1 === 1) return one;
+
+    return five;
+}
+
+    // Количество и вид
+let resources = [];
+
+[
+    ['res_shell', 'ракушка', 'ракушки', 'ракушек'],
+    ['res_branch', 'крепкая ветка', 'крепкие ветки', 'крепких веток'],
+    ['res_moss', 'мох', 'мха', 'мха'],
+    ['res_dense', 'плотная водоросль', 'плотные водоросли', 'плотных водорослей'],
+    ['res_heal', 'целебная водоросль', 'целебные водоросли', 'целебных водорослей']
+].forEach(([id, one, two, five]) => {
+    const count = parseInt($('#' + id).val()) || 0;
+
+    if (count > 0) {
+        resources.push(
+            `${count} ${declension(count, one, two, five)}`
+        );
+    }
+});
+
+    if (resources.length) {
+        text += `\n[b]Количество и вид:[/b] ${resources.join(', ')}.`;
+    }
+
+    // Уникальный ID
+    const uniqueID = $('#kpv_unique_id').val().trim();
+
+    if (uniqueID) {
+        text += `\n[b]Уникальный ID:[/b] ${uniqueID}.`;
+    }
+
+    // Хочу сдать
+    const store = $('#kpv_swim_store').val();
+
+    if (store !== 'нет') {
+        text += `\n[b]Хочу сдать:[/b] ${store}.`;
+    }
+
+    let val = $('#comment').val();
+
+    if (val) {
+        val += "\n\n";
+    }
+
+    $('#comment').val(val + text).scrollintoview();
+});
+          $('#kpv_doz_nar_block').on('click', '.add-field', function (e) {
+            let max_children = 5;
+            let data_id = $(this).data('id'),
+              template = $('#' + data_id)[0];
+            let $fields = $('.' + data_id);
+            let last_e = $fields[$fields.length - 1];
+            if ($fields.length < max_children) {
+              let clone = document.importNode(template.content, true);
+              let add = $(clone).insertAfter(last_e);
+              $(last_e).find($('.add-field')).css('display', 'none');
+            }
+          });
+          $('#kpv_doz_nar_block').on('click', '.del-field', function (e) {
+            let data_id = $(this).data('id');
+            $(this).closest($('.' + data_id)).remove();
+
+            let $fields = $('.' + data_id);
+            let last_e = $fields[$fields.length - 1];
+            $(last_e).find($('.add-field')).css('display', 'inline-block');
+          });
+        }
+
 
 /* ========================================================= */
 
