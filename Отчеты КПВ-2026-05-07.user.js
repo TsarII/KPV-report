@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Отчеты КПВ
+// @name         KPV report
 // @namespace    http://tampermonkey.net/
-// @version      2.0
+// @version      2.1
 // @description  Автоматическое заполнение отчётов
 // @match        https://*.catwar.su/blog*
 // @match        https://*.catwar.net/blog*
