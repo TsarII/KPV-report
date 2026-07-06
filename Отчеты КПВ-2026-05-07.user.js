@@ -2,7 +2,7 @@
 // @name         KPV-report
 // @namespace    http://tampermonkey.net/
 // @author       Цари / Ритуал [1241910]
-// @version      2.6
+// @version      2.7
 // @description  Автоматическое заполнение отчётов
 // @match        https://*.catwar.su/blog*
 // @match        https://*.catwar.net/blog*
@@ -1987,7 +1987,7 @@ ${my_id_div}
     placeholder="Ссылка на скриншот">
 
 <button class="inp-button" id="kpv_reward">
-    Заполнить заявку
+    Заполнить
 </button>
   </div>`);
 
